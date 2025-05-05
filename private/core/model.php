@@ -1,0 +1,162 @@
+<?php
+
+// main model
+
+class Model extends Database
+{
+    public $errors = array();
+    function __construct() {
+        if(!property_exists($this, 'table'))
+        {
+            $this->table = strtolower($this::class) . "s";
+        }
+    }
+
+    public function where($column, $value, $orderby = 'desc')
+    {
+        $column = addslashes($column);
+        $query = "select * from $this->table where $column = :value order by id $orderby";
+        $data = $this->query($query,[
+            'value' => $value
+        ]);
+
+           //run functons after select
+        if(is_array($data))
+        {  
+            if(property_exists($this, 'afterSelect'))
+            {
+                foreach($this->afterSelect as $func)
+                {
+                    $data = $this->$func($data);
+                }
+            }
+        }
+        return $data;
+    }
+    public function first($column, $value, $orderby = 'desc')
+    {
+        $column = addslashes($column);
+        $query = "select * from $this->table where $column = :value order by id $orderby";
+        $data = $this->query($query,[
+            'value' => $value
+        ]);
+
+           //run functons after select
+        if(is_array($data))
+        {  
+            if(property_exists($this, 'afterSelect'))
+            {
+                foreach($this->afterSelect as $func)
+                {
+                    $data = $this->$func($data);
+                }
+            }
+        }
+        if(is_array($data))
+        {
+            $data = $data[0];
+        }
+        return $data;
+    }
+    public function findAll( $orderby = 'desc')
+    {
+        $query = "select * from $this->table order by id $orderby";
+        $data = $this->query($query);
+
+         //run functons after select
+        if(is_array($data)){  
+            if(property_exists($this, 'afterSelect'))
+            {
+                foreach($this->afterSelect as $func)
+                {
+                    $data = $this->$func($data);
+                }
+            }
+        }
+         return $data;
+
+    }
+
+    public function insert($data)
+    {
+
+        //remove unwanted columns
+        if(property_exists($this, 'allowedColumns'))
+        {
+            foreach($data as $key => $column)
+            {
+                if(!in_array($key, $this->allowedColumns))
+                {
+                    unset($data[$key]);
+                }
+            }
+        }
+       
+        //run functons before insert
+        if(property_exists($this, 'beforeInsert'))
+        {
+            foreach($this->beforeInsert as $func)
+            {
+                $data = $this->$func($data);
+            }
+        }
+
+        $keys = array_keys($data);
+        $columns = implode (',' , $keys);
+        $values = implode (',:' , $keys);
+
+
+        $query = "insert into $this->table ($columns) values (:$values)";
+        return $this->query($query, $data);
+
+    }
+
+    public function update($id, $data)
+    {
+               //remove unwanted columns
+               if(property_exists($this, 'allowedColumns'))
+               {
+                   foreach($data as $key => $column)
+                   {
+                       if(!in_array($key, $this->allowedColumns))
+                       {
+                           unset($data[$key]);
+                       }
+                   }
+               }
+              
+               //run functons before update
+               if(property_exists($this, 'beforeUpdate'))
+               {
+                   foreach($this->beforeUpdate as $func)
+                   {
+                       $data = $this->$func($data);
+                   }
+               }
+
+        $str = "";
+        foreach ($data as $key => $value) {
+            $str .= $key. "=:". $key. ",";
+        }
+
+        $str = trim ($str, ",");
+
+        $data['id'] = $id;
+
+        $query = "update $this->table set $str where id = :id";
+        
+        // removed by instructor
+       // echo $query;
+        
+        return $this->query($query, $data);
+    }
+
+    public function delete($id)
+    {
+        $data['id'] = $id;
+        $query = "delete from $this->table where id = :id";
+        return $this->query($query, $data);
+
+
+    }
+}
