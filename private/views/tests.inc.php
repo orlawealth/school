@@ -12,7 +12,7 @@
             <?php foreach($rows as $row): ?>
                 <tr>
                     <td>
-                        <a href="<?=ROOT?>/single_test/<?=$row->class_id?>">
+                        <a href="<?=ROOT?>/single_test/<?=$row->test_id?>">
                         <button class="btn btn-sm btn-primary"><i class="fa fa-chevron-right"></i></button>
                         </a>
                     </td>

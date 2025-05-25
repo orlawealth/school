@@ -20,7 +20,9 @@
                 </tr>
 
                 <?php $active = $row->disabled ? "No":"Yes"; ?>
-                <tr><td><b>Active: </b><?=$active?></td> <td colspan="5"> <b>Test Description:</b> <br> <?=esc($row->description)?> </td> </tr>
+                <tr>
+                    <td><b>Active: </b><?=$active?></td>        
+                    <td colspan="5"> <b>Test Description:</b> <br> <?=esc($row->description)?> </td> </tr>
 
             </table>
         </div>
@@ -34,9 +36,19 @@
                   include(views_path('test-tab-view'));
                     break;
                 
-                case 'add':
+                case 'add-subjective':
                     # code...
-                    include(views_path('test-tab-add'));
+                    include(views_path('test-tab-add-subjective'));
+                    break;
+
+                case 'add-multiple':
+                    # code...
+                    include(views_path('test-tab-add-multiple'));
+                    break;
+
+                case 'add-objective':
+                    # code...
+                    include(views_path('test-tab-add-objective'));
                     break;
                 
                 case 'edit':
